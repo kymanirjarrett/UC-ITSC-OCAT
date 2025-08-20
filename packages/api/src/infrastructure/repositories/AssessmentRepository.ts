@@ -4,13 +4,13 @@ import { Assessment } from '../sequelize/models/Assessment';
 
 export class AssessmentRepository implements IAssessmentRepository {
   public async create(assessmentData: CreateAssessmentDTO): Promise<AssessmentType> {
-    // TODO: Implement Create
+    // Implement Create
     const created = await Assessment.create(assessmentData);
     return created.get({ plain: true }) as AssessmentType;
   }
 
   public async findAll(): Promise<AssessmentType[]> {
-    // TODO: Implement Find All
+    // Implement Find All
     const assessments = await Assessment.findAll();
     return assessments.map(a => a.get({ plain: true }) as AssessmentType);
   }

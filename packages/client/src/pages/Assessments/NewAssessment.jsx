@@ -1,58 +1,69 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Form } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
 import { AssessmentService } from '../../services/AssessmentService';
-import { set, useForm } from 'react-hook-form';
 
 export const NewAssessment = () => {
+  const { register, handleSubmit } = useForm();
 
-  const [form, setForm] = useState({
-    catName: '',
-    catDateOfBirth: '',
-    prevContact: '',
-    catAltercations: '',
-    ownerAltercations: '',
-    dogPlay: '',
-    hissStranger: '',
-  });
 
-  const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
+  const onSubmit = async (data) => {
+
+    // Calculate score and riskLevel based on the form responses
+    const scoreFields = [
+      'prevContact',
+      'catAltercations',
+      'ownerAltercations',
+      'dogPlay',
+      'hissStranger',
+    ];
+
+    let score = 0;
+    scoreFields.forEach((field) => {
+      if (data[field] === 'yes') {
+        score += 1;
+      }
     });
-  };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    await AssessmentService.submit(form);
-    // Optionally reset form or show success message here
-    setForm({
-      catName: '',
-      catDateOfBirth: '',
-      prevContact: '',
-      catAltercations: '',
-      ownerAltercations: '',
-      dogPlay: '',
-      hissStranger: '',
-    });
-    alert('Assessment submitted successfully!');
+    let riskLevel = 'low';
+    if (score >= 5) {
+      riskLevel = 'high';
+    } else if (score >= 3) {
+      riskLevel = 'medium';
+    }
+
+    // Add score and riskLevel to the data sent to the backend
+    const assessmentScore = {
+      catName: data.catName,
+      catDateOfBirth: data.catDateOfBirth,
+      instrumentType: data.instrumentType,
+      score,
+      riskLevel,
+    };
+
+    console.log('Form Data:', assessmentScore);
+    await AssessmentService.submit(assessmentScore);
   };
 
   return (
-    
-    <Form onSubmit={onSubmit}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      
+      <Form.Group controlId="instrumentType" className="mt-3">
+        <Form.Label className='fs-1'> Cat Behavioral Instrument </Form.Label>
+        <Form.Control
+          readOnly
+          type="hidden"
+          defaultValue={1}
+          {...register('instrumentType', { required: true })}
+        />
+      </Form.Group>
 
-      <h2> Cat Behavioral Instrument </h2>
-
-      <Form.Group controlId="catName" className='mt-3'>
+      <Form.Group controlId="catName" className="mt-3">
         <Form.Label>Cat's Name</Form.Label>
         <Form.Control
           type="text"
-          name="catName"
-          value={form.catName}
-          onChange={handleChange}
           placeholder="Enter cat's name"
-          required
+          {...register('catName', { required: true })}
         />
       </Form.Group>
 
@@ -60,10 +71,7 @@ export const NewAssessment = () => {
         <Form.Label>Date of Birth</Form.Label>
         <Form.Control
           type="date"
-          name="catDateOfBirth"
-          value={form.catDateOfBirth}
-          onChange={handleChange}
-          required
+          {...register('catDateOfBirth', { required: true })}
         />
       </Form.Group>
 
@@ -71,22 +79,16 @@ export const NewAssessment = () => {
         <Form.Label>Previous Contact with the Cat Judicial System</Form.Label>
         <div>
           <Form.Check
-            type ="radio"
-            label="Yes"
-            name="prevContact"
+            type="radio"
+            label="Yes (Score = 1)"
             value="yes"
-            checked={form.prevContact === 'yes'}
-            onChange={handleChange}
-            required
+            {...register('prevContact', { required: true })}
           />
           <Form.Check
             type="radio"
-            label="No"
-            name="prevContact"
+            label="No (Score = 0)"
             value="no"
-            checked={form.prevContact === 'no'}
-            onChange={handleChange}
-            required
+            {...register('prevContact', { required: true })}
           />
         </div>
       </Form.Group>
@@ -95,22 +97,16 @@ export const NewAssessment = () => {
         <Form.Label>Physical Altercations with other Cats</Form.Label>
         <div>
           <Form.Check
-            type ="radio"
-            label="Yes"
-            name="catAltercations"
+            type="radio"
+            label="3+ Altercations (Score = 1)"
             value="yes"
-            checked={form.catAltercations === 'yes'}
-            onChange={handleChange}
-            required
+            {...register('catAltercations', { required: true })}
           />
           <Form.Check
             type="radio"
-            label="No"
-            name="catAltercations"
+            label="0-3 Altercations (Score = 0)"
             value="no"
-            checked={form.catAltercations === 'no'}
-            onChange={handleChange}
-            required
+            {...register('catAltercations', { required: true })}
           />
         </div>
       </Form.Group>
@@ -119,22 +115,16 @@ export const NewAssessment = () => {
         <Form.Label>Physical Altercations with owner (scratching, biting, etc...)</Form.Label>
         <div>
           <Form.Check
-            type ="radio"
-            label="Yes"
-            name="ownerAltercations"
+            type="radio"
+            label="10+ Altercations (Score = 1)"
             value="yes"
-            checked={form.ownerAltercations === 'yes'}
-            onChange={handleChange}
-            required
+            {...register('ownerAltercations', { required: true })}
           />
           <Form.Check
             type="radio"
-            label="No"
-            name="ownerAltercations"
+            label="0-10 Altercations (Score = 0)"
             value="no"
-            checked={form.ownerAltercations === 'no'}
-            onChange={handleChange}
-            required
+            {...register('ownerAltercations', { required: true })}
           />
         </div>
       </Form.Group>
@@ -143,46 +133,34 @@ export const NewAssessment = () => {
         <Form.Label>Plays well with dogs</Form.Label>
         <div>
           <Form.Check
-            type ="radio"
-            label="Yes"
-            name="dogPlay"
+            type="radio"
+            label="No (Score = 1)"
             value="yes"
-            checked={form.dogPlay === 'yes'}
-            onChange={handleChange}
-            required
+            {...register('dogPlay', { required: true })}
           />
           <Form.Check
             type="radio"
-            label="No"
-            name="dogPlay"
+            label="Yes (Score = 0)"
             value="no"
-            checked={form.dogPlay === 'no'}
-            onChange={handleChange}
-            required
+            {...register('dogPlay', { required: true })}
           />
         </div>
       </Form.Group>
 
       <Form.Group controlId="hissStranger" className="mt-3">
-        <Form.Label> Hisses at strangers </Form.Label>
+        <Form.Label>Hisses at strangers</Form.Label>
         <div>
           <Form.Check
-            type ="radio"
-            label="Yes"
-            name="hissStranger"
+            type="radio"
+            label="Yes (Score = 1)"
             value="yes"
-            checked={form.hissStranger === 'yes'}
-            onChange={handleChange}
-            required
+            {...register('hissStranger', { required: true })}
           />
           <Form.Check
             type="radio"
-            label="No"
-            name="hissStranger"
+            label="No (Score = 0)"
             value="no"
-            checked={form.hissStranger === 'no'}
-            onChange={handleChange}
-            required
+            {...register('hissStranger', { required: true })}
           />
         </div>
       </Form.Group>
