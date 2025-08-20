@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import { AssessmentService } from '../../services/AssessmentService';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 
 export const NewAssessment = () => {
 
   const [form, setForm] = useState({
     catName: '',
-    dob: '',
+    catDateOfBirth: '',
+    prevContact: '',
+    catAltercations: '',
+    ownerAltercations: '',
+    dogPlay: '',
+    hissStranger: '',
   });
 
   const handleChange = (e) => {
@@ -21,6 +26,16 @@ export const NewAssessment = () => {
     e.preventDefault();
     await AssessmentService.submit(form);
     // Optionally reset form or show success message here
+    setForm({
+      catName: '',
+      catDateOfBirth: '',
+      prevContact: '',
+      catAltercations: '',
+      ownerAltercations: '',
+      dogPlay: '',
+      hissStranger: '',
+    });
+    alert('Assessment submitted successfully!');
   };
 
   return (
@@ -41,12 +56,12 @@ export const NewAssessment = () => {
         />
       </Form.Group>
 
-      <Form.Group controlId="dob" className="mt-3">
+      <Form.Group controlId="catDateOfBirth" className="mt-3">
         <Form.Label>Date of Birth</Form.Label>
         <Form.Control
           type="date"
-          name="dob"
-          value={form.dob}
+          name="catDateOfBirth"
+          value={form.catDateOfBirth}
           onChange={handleChange}
           required
         />
