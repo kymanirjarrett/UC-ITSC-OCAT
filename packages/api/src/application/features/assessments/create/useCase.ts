@@ -2,6 +2,8 @@ import { inject, injectable } from 'inversify';
 import { IUseCase } from 'src/types/shared';
 import { Assessment, CreateAssessmentDTO } from 'src/types';
 import { IAssessmentRepository } from '../../../contracts';
+import express from 'express';
+import { create } from 'domain';
 
 @injectable()
 export class CreateAssessmentUseCase implements IUseCase<CreateAssessmentDTO, Assessment> {
@@ -10,14 +12,40 @@ export class CreateAssessmentUseCase implements IUseCase<CreateAssessmentDTO, As
   ) {}
 
   public async execute(assessmentData: CreateAssessmentDTO): Promise<Assessment> {
-    // TODO: Implement business validation logic here
-    // HINT: Validate that the score is between 0 and 5
-    // HINT: Validate that the risk level matches the score calculation
 
-    // TODO: Create the assessment using the repository
-    // HINT: use this.assessmentRepository.create(assessmentData)
-    return Promise.reject(new Error(`CreateAssessmentUseCase.execute() not implemented yet`));
+    // HINT: Validate that the score is between 0 and 5 and that the risk level matches the score calculation
+
+    if (assessmentData.score < 0 || assessmentData.score > 5) 
+    {
+      throw new Error('Score must be between 0 and 5');
+    }
+
+    const expectedRiskLevel = this.calculateRiskLevel(assessmentData.score);
+
+    if (assessmentData.riskLevel !== expectedRiskLevel) 
+    {
+      throw new Error(`Risk level ${assessmentData.riskLevel} does not match calculated risk level ${expectedRiskLevel}`);
+    }
+
+    // Creates the assessment using the repository
+
+    const assessment = await this.assessmentRepository.create(assessmentData);
+
+    return assessment;
   }
 
-  // TODO: Add private helper methods for validation and risk level calculation
+  // private helper methods for validation and risk level calculation
+
+  private calculateRiskLevel(score: number): string {
+    if 
+    (score <= 2) {
+      return 'low';
+    } 
+    else if (score <= 4) {
+      return 'medium';
+    } 
+    else {
+      return 'high';
+    }
+  }
 }
