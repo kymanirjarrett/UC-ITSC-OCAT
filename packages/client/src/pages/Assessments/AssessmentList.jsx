@@ -17,7 +17,12 @@ export const AssessmentList = () => {
     () => [
       { Header: 'ID', accessor: 'id' },
       { Header: "Cat's Name", accessor: 'catName' },
-      { Header: 'Date of Birth', accessor: 'catDateOfBirth' },
+      { Header: 'Date of Birth', 
+        accessor: 'catDateOfBirth',
+        cell: ({getValue}) => {
+          const date = getValue();
+          return date ? newDate(date).toISOString().split('T')[0] : '';
+        }},
       { Header: 'Assessment Score', accessor: 'score' },
       { Header: 'Risk Level', accessor: 'riskLevel' },
     ],
