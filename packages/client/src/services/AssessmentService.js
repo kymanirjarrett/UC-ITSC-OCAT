@@ -19,7 +19,7 @@ export class AssessmentService {
           // TODO: Add any query parameters here for filtering, pagination, etc.
         },
       })
-        .then((response) => response.data.data.assessments);
+        .then((response) => response.data.assessments);
     } catch (err) {
       throw new Error(`${err.response.statusText} - ${err.response.data.message}`);
     }
