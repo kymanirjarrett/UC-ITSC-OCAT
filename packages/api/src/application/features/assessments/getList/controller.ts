@@ -15,7 +15,7 @@ export class GetAssessmentListController extends BaseController {
   protected async executeImpl(req: Request, res: Response): Promise<void> {
     try {
       const assessments = await this.getAssessmentListUseCase.execute();
-      res.status(200).json({ assessments });
+      return assessments 
     } catch (err) {
       res.status(500).json({ message: err.message });
     }
