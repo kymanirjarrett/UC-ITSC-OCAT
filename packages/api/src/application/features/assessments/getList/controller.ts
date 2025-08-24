@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { Assessment } from 'src/types';
 import { BaseController } from '../../../../infrastructure/http/BaseController';
 import { GetAssessmentListUseCase } from './useCase';
@@ -12,7 +12,12 @@ export class GetAssessmentListController extends BaseController {
     super();
   }
 
-  protected async executeImpl(req: Request): Promise<Assessment[]> {
-    return Promise.reject(new Error(`Not implemented`));
+  protected async executeImpl(req: Request, res: Response): Promise<void> {
+    try {
+      const assessments = await this.getAssessmentListUseCase.execute();
+      return assessments 
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   }
 }

@@ -18,8 +18,15 @@ const router = createBrowserRouter([
     </SiteWrapper>,
     path: `/assessment/new`,
   },
+  {
+    element: <SiteWrapper>
+      <AssessmentList />
+    </SiteWrapper>,
+    path: `/assessment/list`,
+  },
 ]);
 
 const App = () => <RouterProvider router={router} />;
 
 export default App;
+
